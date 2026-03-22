@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>뽀짝 투두 — 디자인 시스템 미리보기</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ===========================
+       CSS 변수 — 디자인 토큰
+    =========================== */
+    :root {
+      --color-primary:    #B39DDB;
+      --color-primary-dark: #9575CD;
+      --color-secondary:  #F48FB1;
+      --color-accent:     #80CBC4;
+      --color-bg:         #FFF8FC;
+      --color-card:       #FFFFFF;
+      --color-text:       #4A3F55;
+      --color-muted:      #B0A8BC;
+      --color-success:    #A5D6A7;
+      --color-error:      #EF9A9A;
+      --color-warning:    #FFE082;
+      --color-border:     #F0EBF8;
+      --color-border-light: #E8E0F0;
+
+      --font-display: 'Gaegu', 'Noto Sans KR', sans-serif;
+      --font-body:    'Noto Sans KR', sans-serif;
+
+      --radius-sm:   8px;
+      --radius-md:   16px;
+      --radius-lg:   20px;
+      --radius-xl:   24px;
+      --radius-full: 9999px;
+
+      --shadow-sm: 0 1px 4px rgba(179,157,219,0.12), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 16px rgba(179,157,219,0.18), 0 2px 6px rgba(0,0,0,0.06);
+      --shadow-lg: 0 8px 32px rgba(179,157,219,0.24), 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    /* ===========================
+       리셋 & 기본 스타일
+    =========================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--color-bg);
+      background-image:
+        radial-gradient(circle at 20% 10%, rgba(179,157,219,0.12) 0%, transparent 40%),
+        radial-gradient(circle at 80% 90%, rgba(244,143,177,0.10) 0%, transparent 40%),
+        radial-gradient(circle at 60% 40%, rgba(128,203,196,0.08) 0%, transparent 30%);
+      color: var(--color-text);
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* ===========================
+       문서 레이아웃 (미리보기 전용)
+    =========================== */
+    .preview-doc {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    .preview-doc h1 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 4px;
+    }
+
+    .preview-doc > .subtitle {
+      color: var(--color-muted);
+      font-size: 0.875rem;
+      margin-bottom: 56px;
+    }
+
+    .section {
+      margin-bottom: 64px;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 2px;
+      background: linear-gradient(90deg, var(--color-border), transparent);
+      border-radius: var(--radius-full);
+    }
+
+    /* ===========================
+       1. 컬러 팔레트 스와치
+    =========================== */
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 16px;
+    }
+
+    .swatch {
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .swatch-color {
+      height: 72px;
+    }
+
+    .swatch-info {
+      background: white;
+      padding: 10px 12px;
+    }
+
+    .swatch-name {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    .swatch-hex {
+      font-size: 0.7rem;
+      color: var(--color-muted);
+      font-family: monospace;
+    }
+
+    /* ===========================
+       2. 타이포그래피
+    =========================== */
+    .typo-list {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .typo-row {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .typo-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .typo-meta {
+      min-width: 100px;
+      font-size: 0.75rem;
+      color: var(--color-muted);
+      line-height: 1.4;
+    }
+
+    .typo-meta strong {
+      display: block;
+      color: var(--color-text);
+      font-weight: 600;
+    }
+
+    /* ===========================
+       3. 컴포넌트
+    =========================== */
+    .component-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: 28px 32px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 16px;
+    }
+
+    .component-label {
+      font-size: 0.75rem;
+      color: var(--color-muted);
+      font-weight: 500;
+      width: 100%;
+      margin-bottom: 4px;
+    }
+
+    /* 버튼 */
+    .btn-primary {
+      background: var(--color-primary);
+      color: white;
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 10px 24px;
+      border-radius: var(--radius-full);
+      border: none;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-primary:focus-visible {
+      outline: 3px solid var(--color-primary);
+      outline-offset: 3px;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--color-primary);
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 10px 24px;
+      border-radius: var(--radius-full);
+      border: 2px solid var(--color-primary);
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.18s ease;
+    }
+
+    .btn-secondary:hover {
+      background: #F3EFF9;
+      transform: translateY(-2px);
+    }
+
+    .btn-icon {
+      background: transparent;
+      color: var(--color-error);
+      font-size: 1rem;
+      padding: 8px;
+      border-radius: var(--radius-full);
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+    }
+
+    .btn-icon:hover {
+      background: #FFF0F0;
+    }
+
+    .filter-tab {
+      font-family: var(--font-body);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      padding: 6px 16px;
+      border-radius: var(--radius-full);
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .filter-tab.active {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .filter-tab.inactive {
+      background: white;
+      color: var(--color-muted);
+      border: 1.5px solid var(--color-border-light);
+    }
+
+    .filter-tab.inactive:hover {
+      background: #F3EFF9;
+      color: var(--color-primary);
+    }
+
+    /* 입력 필드 */
+    .input-field {
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      background: white;
+      border: 2px solid var(--color-border-light);
+      border-radius: var(--radius-lg);
+      padding: 12px 16px;
+      color: var(--color-text);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .input-field::placeholder {
+      color: var(--color-muted);
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 4px rgba(179,157,219,0.15);
+    }
+
+    /* 뱃지 */
+    .badge {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .badge-study    { background: #EDE7F6; color: #7B5EA7; }
+    .badge-work     { background: #E3F2FD; color: #1565C0; }
+    .badge-life     { background: #FCE4EC; color: #AD1457; }
+    .badge-health   { background: #E8F5E9; color: #2E7D32; }
+    .badge-etc      { background: #FFF8E1; color: #E65100; }
+
+    /* 커스텀 체크박스 */
+    .custom-checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .custom-checkbox {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid #D1C4E9;
+      background: white;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      flex-shrink: 0;
+    }
+
+    .custom-checkbox:hover {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(179,157,219,0.2);
+    }
+
+    .custom-checkbox:checked {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      transform: scale(1.1);
+    }
+
+    .custom-checkbox:checked::after {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 2px;
+      width: 7px;
+      height: 11px;
+      border: 2.5px solid white;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg);
+    }
+
+    .custom-checkbox:focus-visible {
+      outline: 3px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+
+    /* ===========================
+       4. 앱 메인 페이지 프리뷰
+    =========================== */
+    .app-frame {
+      max-width: 480px;
+      margin: 0 auto;
+      background: var(--color-bg);
+      border-radius: 32px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(74,63,85,0.15), 0 4px 20px rgba(0,0,0,0.08);
+      border: 1px solid rgba(255,255,255,0.8);
+    }
+
+    /* 앱 헤더 */
+    .app-header {
+      background: linear-gradient(135deg, #C9B8E8 0%, #E8B4CB 100%);
+      padding: 28px 24px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .app-header::before {
+      content: '';
+      position: absolute;
+      top: -30px;
+      right: -30px;
+      width: 120px;
+      height: 120px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 50%;
+    }
+
+    .app-header::after {
+      content: '';
+      position: absolute;
+      bottom: -20px;
+      left: 40%;
+      width: 80px;
+      height: 80px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+    }
+
+    .app-header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .app-title {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: white;
+      text-shadow: 0 1px 4px rgba(74,63,85,0.2);
+    }
+
+    .app-date {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.85);
+      font-weight: 500;
+    }
+
+    /* 달성률 위젯 */
+    .app-body {
+      padding: 20px 16px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .achievement-card {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .character {
+      font-size: 3rem;
+      line-height: 1;
+      flex-shrink: 0;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+
+    .achievement-info {
+      flex: 1;
+    }
+
+    .achievement-message {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 8px;
+    }
+
+    .progress-bar-wrapper {
+      background: #F0EBF8;
+      border-radius: var(--radius-full);
+      height: 10px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+      transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .progress-text {
+      font-size: 0.8rem;
+      color: var(--color-muted);
+    }
+
+    .progress-text strong {
+      color: var(--color-primary);
+      font-weight: 700;
+    }
+
+    /* 카테고리 필터 */
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .filter-row::-webkit-scrollbar { display: none; }
+
+    /* 입력 폼 */
+    .input-form {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .app-input {
+      flex: 1;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      background: #FAF7FF;
+      border: 2px solid var(--color-border-light);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      color: var(--color-text);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .app-input::placeholder { color: var(--color-muted); }
+    .app-input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(179,157,219,0.15);
+    }
+
+    .app-add-btn {
+      background: var(--color-primary);
+      color: white;
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      white-space: nowrap;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .app-add-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* 섹션 헤더 */
+    .list-section-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--color-text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 4px;
+    }
+
+    /* 투두 카드 */
+    .todo-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .todo-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      box-shadow: var(--shadow-sm);
+      border: 1.5px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: box-shadow 0.2s ease, transform 0.15s ease;
+    }
+
+    .todo-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+
+    .todo-card.done {
+      background: #F4FBF4;
+      border-color: #C8E6C9;
+    }
+
+    .todo-card.done .todo-text {
+      text-decoration: line-through;
+      color: var(--color-muted);
+    }
+
+    .todo-text {
+      flex: 1;
+      font-size: 0.9rem;
+      color: var(--color-text);
+      line-height: 1.5;
+    }
+
+    .todo-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .todo-delete-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 4px;
+      border-radius: var(--radius-full);
+      color: var(--color-error);
+      transition: background 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+    }
+
+    .todo-delete-btn:hover {
+      background: #FFF0F0;
+    }
+
+    /* 완료된 체크 표시 */
+    .check-done {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--color-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(128,203,196,0.4);
+    }
+
+    .check-done svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .check-empty {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid #D1C4E9;
+      background: white;
+      flex-shrink: 0;
+      transition: border-color 0.15s ease;
+    }
+
+    /* 빈 상태 */
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--color-muted);
+      font-size: 0.875rem;
+    }
+
+    .empty-state .empty-emoji {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    /* ===========================
+       미리보기 전용 구분선
+    =========================== */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--color-border), transparent);
+      margin: 8px 0;
+    }
+
+    /* ===========================
+       반응형
+    =========================== */
+    @media (max-width: 600px) {
+      .preview-doc {
+        padding: 24px 16px 60px;
+      }
+
+      .palette-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      }
+
+      .typo-row {
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .app-frame {
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="preview-doc">
+
+    <!-- 타이틀 -->
+    <h1>🌸 뽀짝 투두 디자인 시스템</h1>
+    <p class="subtitle">PIXEL PUNCH Web Agency — UI/UX Design Preview · 디자이너: 디지</p>
+
+    <!-- ===========================
+         1. 컬러 팔레트
+    =========================== -->
+    <section class="section">
+      <h2 class="section-title">🎨 컬러 팔레트</h2>
+      <div class="palette-grid">
+        <div class="swatch">
+          <div class="swatch-color" style="background:#B39DDB;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Primary</div>
+            <div class="swatch-hex">#B39DDB</div>
+            <div class="swatch-hex" style="font-size:0.65rem; color:#aaa;">라벤더 퍼플</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#F48FB1;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Secondary</div>
+            <div class="swatch-hex">#F48FB1</div>
+            <div class="swatch-hex" style="font-size:0.65rem; color:#aaa;">핑크</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#80CBC4;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Accent</div>
+            <div class="swatch-hex">#80CBC4</div>
+            <div class="swatch-hex" style="font-size:0.65rem; color:#aaa;">민트</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#FFF8FC; border: 1px solid #F0EBF8;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Background</div>
+            <div class="swatch-hex">#FFF8FC</div>
+            <div class="swatch-hex" style="font-size:0.65rem; color:#aaa;">블러시 화이트</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#4A3F55;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Text</div>
+            <div class="swatch-hex">#4A3F55</div>
+            <div class="swatch-hex" style="font-size:0.65rem; color:#aaa;">딥 라벤더 그레이</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#B0A8BC;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Muted</div>
+            <div class="swatch-hex">#B0A8BC</div>
+            <div class="swatch-hex" style="font-size:0.65rem; color:#aaa;">흐린 보라 그레이</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#A5D6A7;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Success</div>
+            <div class="swatch-hex">#A5D6A7</div>
+            <div class="swatch-hex" style="font-size:0.65rem; color:#aaa;">연한 그린</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#EF9A9A;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Error</div>
+            <div class="swatch-hex">#EF9A9A</div>
+            <div class="swatch-hex" style="font-size:0.65rem; color:#aaa;">연한 레드</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#FFE082;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Warning</div>
+            <div class="swatch-hex">#FFE082</div>
+            <div class="swatch-hex" style="font-size:0.65rem; color:#aaa;">파스텔 옐로</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===========================
+         2. 타이포그래피
+    =========================== -->
+    <section class="section">
+      <h2 class="section-title">✍️ 타이포그래피</h2>
+      <div class="typo-list">
+        <div class="typo-row">
+          <div class="typo-meta"><strong>Display</strong>28px / 700</div>
+          <div style="font-family:'Gaegu',sans-serif; font-size:1.75rem; font-weight:700; color:#4A3F55;">🌸 뽀짝 투두</div>
+        </div>
+        <div class="typo-row">
+          <div class="typo-meta"><strong>Heading 1</strong>22px / 700</div>
+          <div style="font-family:'Gaegu',sans-serif; font-size:1.375rem; font-weight:700; color:#4A3F55;">오늘 할 일 5개 중 3개 완료!</div>
+        </div>
+        <div class="typo-row">
+          <div class="typo-meta"><strong>Heading 2</strong>18px / 600</div>
+          <div style="font-family:'Noto Sans KR',sans-serif; font-size:1.125rem; font-weight:600; color:#4A3F55;">디자인 시안 작성하기</div>
+        </div>
+        <div class="typo-row">
+          <div class="typo-meta"><strong>Body</strong>15px / 400</div>
+          <div style="font-family:'Noto Sans KR',sans-serif; font-size:0.9375rem; font-weight:400; color:#4A3F55;">카페 가서 공부하기 — 오늘 안에 끝내기!</div>
+        </div>
+        <div class="typo-row">
+          <div class="typo-meta"><strong>Caption</strong>12px / 400</div>
+          <div style="font-family:'Noto Sans KR',sans-serif; font-size:0.75rem; font-weight:400; color:#B0A8BC;">2026년 3월 23일 · 월요일</div>
+        </div>
+        <div class="typo-row">
+          <div class="typo-meta"><strong>Button</strong>14px / 600</div>
+          <div style="font-family:'Noto Sans KR',sans-serif; font-size:0.875rem; font-weight:600; color:#B39DDB;">+ 추가하기</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===========================
+         3. 컴포넌트 미리보기
+    =========================== -->
+    <section class="section">
+      <h2 class="section-title">🧩 컴포넌트</h2>
+
+      <!-- 버튼 -->
+      <div class="component-row">
+        <div class="component-label">버튼</div>
+        <button class="btn-primary">✨ 추가하기</button>
+        <button class="btn-secondary">필터 초기화</button>
+        <button class="btn-icon" aria-label="삭제">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"></path>
+            <path d="M10 11v6M14 11v6"></path>
+            <path d="M9 6V4h6v2"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- 필터 탭 -->
+      <div class="component-row">
+        <div class="component-label">필터 탭</div>
+        <button class="filter-tab active">전체</button>
+        <button class="filter-tab inactive">📚 공부</button>
+        <button class="filter-tab inactive">💼 업무</button>
+        <button class="filter-tab inactive">🌸 일상</button>
+        <button class="filter-tab inactive">🥗 건강</button>
+      </div>
+
+      <!-- 입력 필드 -->
+      <div class="component-row">
+        <div class="component-label">입력 필드</div>
+        <input class="input-field" type="text" placeholder="🌸 할 일을 입력하세요..." />
+      </div>
+
+      <!-- 뱃지 -->
+      <div class="component-row">
+        <div class="component-label">카테고리 뱃지</div>
+        <span class="badge badge-study">📚 공부</span>
+        <span class="badge badge-work">💼 업무</span>
+        <span class="badge badge-life">🌸 일상</span>
+        <span class="badge badge-health">🥗 건강</span>
+        <span class="badge badge-etc">✨ 기타</span>
+      </div>
+
+      <!-- 체크박스 -->
+      <div class="component-row">
+        <div class="component-label">커스텀 체크박스</div>
+        <label class="custom-checkbox-wrapper">
+          <input type="checkbox" class="custom-checkbox" aria-label="할 일 완료 표시" />
+          <span style="font-size:0.9rem; color:#4A3F55;">운동 30분 하기</span>
+        </label>
+        <label class="custom-checkbox-wrapper">
+          <input type="checkbox" class="custom-checkbox" checked aria-label="할 일 완료 표시" />
+          <span style="font-size:0.9rem; color:#B0A8BC; text-decoration:line-through;">카페 공부 2시간</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- ===========================
+         4. 앱 메인 페이지 프리뷰
+    =========================== -->
+    <section class="section">
+      <h2 class="section-title">📱 앱 메인 페이지 프리뷰</h2>
+
+      <div class="app-frame" role="main" aria-label="뽀짝 투두 앱 미리보기">
+
+        <!-- 헤더 -->
+        <header class="app-header">
+          <div class="app-header-top">
+            <span class="app-title">🌸 뽀짝 투두</span>
+            <span class="app-date">3월 23일 월요일</span>
+          </div>
+        </header>
+
+        <!-- 앱 바디 -->
+        <div class="app-body">
+
+          <!-- 달성률 위젯 -->
+          <div class="achievement-card" aria-label="오늘 할 일 달성률">
+            <div class="character" aria-hidden="true">🐰</div>
+            <div class="achievement-info">
+              <div class="achievement-message">오늘도 파이팅! ✨</div>
+              <div class="progress-bar-wrapper" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" aria-label="달성률 60%">
+                <div class="progress-bar-fill" style="width:60%;"></div>
+              </div>
+              <div class="progress-text"><strong>3</strong> / 5 완료 🎉</div>
+            </div>
+          </div>
+
+          <!-- 카테고리 필터 -->
+          <div class="filter-row" role="tablist" aria-label="카테고리 필터">
+            <button class="filter-tab active" role="tab" aria-selected="true">전체</button>
+            <button class="filter-tab inactive" role="tab" aria-selected="false">📚 공부</button>
+            <button class="filter-tab inactive" role="tab" aria-selected="false">💼 업무</button>
+            <button class="filter-tab inactive" role="tab" aria-selected="false">🌸 일상</button>
+            <button class="filter-tab inactive" role="tab" aria-selected="false">🥗 건강</button>
+          </div>
+
+          <!-- 입력 폼 -->
+          <div class="input-form" role="form" aria-label="할 일 추가">
+            <input
+              class="app-input"
+              type="text"
+              placeholder="🌸 할 일을 입력하세요..."
+              aria-label="할 일 내용 입력"
+            />
+            <button class="app-add-btn" aria-label="할 일 추가">+ 추가</button>
+          </div>
+
+          <!-- 투두 리스트 -->
+          <div class="list-section-title">📋 오늘 할 일</div>
+
+          <ul class="todo-list" role="list" aria-label="할 일 목록">
+
+            <!-- 미완료 투두 1 -->
+            <li class="todo-card" role="listitem">
+              <div class="check-empty" role="checkbox" aria-checked="false" aria-label="디자인 시안 작성하기 완료 체크"></div>
+              <span class="todo-text">디자인 시안 작성하기</span>
+              <div class="todo-actions">
+                <span class="badge badge-study">📚 공부</span>
+                <button class="todo-delete-btn" aria-label="디자인 시안 작성하기 삭제">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"></path>
+                    <path d="M10 11v6M14 11v6"></path>
+                    <path d="M9 6V4h6v2"></path>
+                  </svg>
+                </button>
+              </div>
+            </li>
+
+            <!-- 완료된 투두 -->
+            <li class="todo-card done" role="listitem">
+              <div class="check-done" role="checkbox" aria-checked="true" aria-label="운동 30분 하기 완료됨">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <span class="todo-text">운동 30분 하기</span>
+              <div class="todo-actions">
+                <span class="badge badge-health">🥗 건강</span>
+                <button class="todo-delete-btn" aria-label="운동 30분 하기 삭제">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"></path>
+                    <path d="M10 11v6M14 11v6"></path>
+                    <path d="M9 6V4h6v2"></path>
+                  </svg>
+                </button>
+              </div>
+            </li>
+
+            <!-- 미완료 투두 2 -->
+            <li class="todo-card" role="listitem">
+              <div class="check-empty" role="checkbox" aria-checked="false" aria-label="카페 가서 공부하기 완료 체크"></div>
+              <span class="todo-text">카페 가서 공부하기 ☕</span>
+              <div class="todo-actions">
+                <span class="badge badge-life">🌸 일상</span>
+                <button class="todo-delete-btn" aria-label="카페 가서 공부하기 삭제">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"></path>
+                    <path d="M10 11v6M14 11v6"></path>
+                    <path d="M9 6V4h6v2"></path>
+                  </svg>
+                </button>
+              </div>
+            </li>
+
+          </ul>
+        </div>
+        <!-- /.app-body -->
+
+      </div>
+      <!-- /.app-frame -->
+    </section>
+
+  </div>
+  <!-- /.preview-doc -->
+</body>
+</html>
